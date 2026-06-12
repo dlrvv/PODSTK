@@ -1,975 +1,325 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>ОТК · Контроль кабин</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.5.0/Recharts.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-<style>
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Inter',sans-serif;background:#0b0f18;color:#e2e8f0;min-height:100vh;}
-.login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(ellipse at 60% 20%,#0f1e3a 0%,#0b0f18 70%);}
-.login-card{background:#111827;border:1px solid #1e293b;border-radius:20px;padding:36px 32px;width:100%;max-width:400px;}
-.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px;}
-.login-logo-mark{width:38px;height:38px;background:linear-gradient(135deg,#1e40af,#3b82f6);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;}
-.login-logo-text{font-size:16px;font-weight:800;color:#f1f5f9;letter-spacing:.04em;}
-.login-logo-sub{font-size:11px;color:#475569;margin-top:1px;}
-.login-heading{font-size:22px;font-weight:700;color:#f1f5f9;margin-bottom:6px;}
-.login-hint{font-size:13px;color:#64748b;margin-bottom:24px;line-height:1.5;}
-.field-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#475569;margin-bottom:7px;}
-.field-wrap{position:relative;margin-bottom:16px;}
-.field-input{width:100%;background:#0b0f18;border:1px solid #1e293b;border-radius:10px;color:#e2e8f0;font-size:15px;padding:12px 14px;font-family:inherit;transition:border-color .15s;}
-.field-input:focus{outline:none;border-color:#3b82f6;}
-.field-input::placeholder{color:#2d3f55;}
-.login-error{font-size:12px;color:#f87171;margin-top:-8px;margin-bottom:12px;padding-left:4px;}
-.btn-login{width:100%;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .15s;font-family:inherit;margin-top:4px;}
-.btn-login:hover{opacity:.9;}
-.btn-login:disabled{background:#1e293b;color:#475569;cursor:not-allowed;opacity:1;}
-.login-names{display:flex;flex-wrap:wrap;gap:6px;margin-top:20px;}
-.name-chip{padding:5px 11px;border-radius:20px;border:1px solid #1e293b;background:#0b0f18;font-size:11px;font-weight:600;color:#475569;cursor:pointer;transition:all .15s;}
-.name-chip:hover{border-color:#3b82f6;color:#93c5fd;}
-.name-chip.inspector{border-color:#1e3a5f;color:#60a5fa;}
-.name-chip.master{border-color:#064e3b;color:#34d399;}
-.hdr{background:#111827;border-bottom:1px solid #1e293b;height:56px;padding:0 20px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:60;}
-.hdr-brand{display:flex;align-items:center;gap:8px;}
-.hdr-mark{width:28px;height:28px;background:linear-gradient(135deg,#1e40af,#3b82f6);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;}
-.hdr-title{font-size:13px;font-weight:700;color:#94a3b8;letter-spacing:.06em;text-transform:uppercase;}
-.hdr-sep{width:1px;height:18px;background:#1e293b;}
-.hdr-user{display:flex;align-items:center;gap:8px;}
-.hdr-av{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
-.hdr-av-i{background:linear-gradient(135deg,#1e40af,#3b82f6);color:#fff;}
-.hdr-av-m{background:linear-gradient(135deg,#065f46,#10b981);color:#fff;}
-.hdr-uname{font-size:13px;font-weight:600;}
-.hdr-urole{font-size:10px;color:#475569;}
-.hdr-r{margin-left:auto;display:flex;gap:8px;align-items:center;}
-.sync-badge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;display:flex;align-items:center;gap:4px;}
-.sync-ok{background:#064e3b;color:#34d399;}
-.sync-saving{background:#1c2a1a;color:#86efac;}
-.sync-err{background:#7f1d1d;color:#fca5a5;}
-.btn-ghost{padding:6px 12px;border-radius:8px;border:1px solid #1e293b;background:transparent;color:#64748b;font-size:12px;cursor:pointer;font-family:inherit;transition:all .15s;}
-.btn-ghost:hover{border-color:#334155;color:#94a3b8;}
-.nav-tabs{display:flex;gap:2px;padding:0 20px;background:#111827;border-bottom:1px solid #1e293b;}
-.nav-tab{padding:12px 16px;font-size:13px;font-weight:600;color:#475569;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;display:flex;align-items:center;gap:7px;}
-.nav-tab:hover{color:#94a3b8;}
-.nav-tab.active{color:#60a5fa;border-bottom-color:#3b82f6;}
-.layout{display:flex;min-height:calc(100vh - 98px);}
-.sidebar{width:250px;background:#111827;border-right:1px solid #1e293b;padding:14px 10px;flex-shrink:0;overflow-y:auto;}
-.sb-hd{display:flex;align-items:center;justify-content:space-between;padding:0 8px;margin-bottom:10px;}
-.sb-hd-label{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#334155;}
-.sb-add{width:22px;height:22px;border-radius:6px;border:none;background:#1e293b;color:#64748b;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
-.sb-add:hover{background:#2d3f55;color:#94a3b8;}
-.sb-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;cursor:pointer;border:1px solid transparent;margin-bottom:2px;transition:all .15s;}
-.sb-item:hover{background:#141e2e;}
-.sb-item.active{background:#182a45;border-color:#1d4ed8;}
-.sb-marker{font-size:13px;font-weight:700;color:#cbd5e1;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.sb-item.active .sb-marker{color:#93c5fd;}
-.sb-dots{display:flex;flex-direction:column;gap:3px;align-items:center;flex-shrink:0;}
-.dot{width:6px;height:6px;border-radius:50%;}
-.dot-full{background:#22c55e;}.dot-part{background:#f59e0b;}.dot-none{background:#1e293b;}
-.sb-empty{font-size:11px;color:#334155;padding:8px 10px;}
-.content{flex:1;overflow-x:hidden;}
-.overview{padding:28px;}
-.ov-title{font-size:20px;font-weight:700;color:#f1f5f9;margin-bottom:4px;}
-.ov-sub{font-size:13px;color:#64748b;margin-bottom:24px;}
-.cabin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;}
-.cabin-card{background:#111827;border:1px solid #1e293b;border-radius:14px;padding:18px;cursor:pointer;transition:all .18s;}
-.cabin-card:hover{border-color:#2d4a6e;transform:translateY(-2px);background:#141e2e;}
-.cc-marker{font-size:18px;font-weight:800;color:#f1f5f9;margin-bottom:3px;}
-.cc-desc{font-size:11px;color:#64748b;margin-bottom:12px;min-height:16px;}
-.cc-phases{display:flex;gap:8px;margin-bottom:12px;}
-.cc-phase{flex:1;background:#0b0f18;border:1px solid #1e293b;border-radius:8px;padding:8px 10px;}
-.cc-phase-name{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#334155;margin-bottom:3px;}
-.cc-phase-pct{font-size:17px;font-weight:700;}
-.pct-g{color:#22c55e;}.pct-y{color:#f59e0b;}.pct-0{color:#334155;}
-.cc-date{font-size:10px;color:#334155;}
-.cabin-add-card{background:transparent;border:2px dashed #1e293b;border-radius:14px;padding:18px;cursor:pointer;transition:all .18s;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:130px;gap:6px;}
-.cabin-add-card:hover{border-color:#334155;background:#0f1520;}
-.cabin-add-icon{font-size:26px;color:#1e293b;}
-.cabin-add-text{font-size:12px;font-weight:600;color:#334155;}
-.cl-wrap{padding:0;}
-.cl-topbar{padding:20px 28px;border-bottom:1px solid #1e293b;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
-.cl-back{font-size:12px;color:#475569;cursor:pointer;display:flex;align-items:center;gap:5px;transition:color .15s;margin-bottom:2px;}
-.cl-back:hover{color:#94a3b8;}
-.cl-title{font-size:20px;font-weight:700;color:#f1f5f9;}
-.cl-sub{font-size:11px;color:#475569;margin-top:2px;}
-.cl-phase-tabs{display:flex;gap:6px;}
-.phase-tab{padding:7px 16px;border-radius:9px;border:1px solid #1e293b;background:#0b0f18;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;color:#475569;font-family:inherit;display:flex;align-items:center;gap:6px;}
-.phase-tab:hover{border-color:#334155;color:#94a3b8;}
-.phase-tab.active{background:#182a45;border-color:#1d4ed8;color:#93c5fd;}
-.tpct{font-size:10px;font-weight:700;padding:1px 6px;border-radius:5px;}
-.tpct-g{background:#14532d;color:#4ade80;}.tpct-y{background:#78350f;color:#fbbf24;}.tpct-0{background:#1e293b;color:#475569;}
-.cl-stats{display:flex;gap:10px;padding:16px 28px;border-bottom:1px solid #1e293b;flex-wrap:wrap;}
-.cstat{flex:1;min-width:80px;background:#111827;border:1px solid #1e293b;border-radius:10px;padding:12px 14px;}
-.cstat-v{font-size:22px;font-weight:700;color:#f1f5f9;}
-.cstat-l{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#475569;margin-top:2px;}
-.cstat.cg{border-color:#14532d;}.cstat.cg .cstat-v{color:#4ade80;}
-.cstat.cr{border-color:#7f1d1d;}.cstat.cr .cstat-v{color:#f87171;}
-.cstat.cy{border-color:#78350f;}.cstat.cy .cstat-v{color:#fbbf24;}
-.prog-row{padding:0 28px 16px;display:flex;align-items:center;gap:12px;}
-.prog-bg{flex:1;background:#1e293b;border-radius:4px;height:5px;overflow:hidden;}
-.prog-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#1d4ed8,#60a5fa);transition:width .4s;}
-.prog-pct{font-size:11px;font-weight:600;color:#475569;min-width:32px;text-align:right;}
-.ro-banner{margin:16px 28px 0;padding:9px 14px;background:#064e3b;border:1px solid #065f46;border-radius:9px;font-size:12px;color:#6ee7b7;display:flex;align-items:center;gap:7px;}
-.sections{padding:16px 28px 32px;}
-.section{margin-bottom:14px;}
-.sec-hd{display:flex;align-items:center;gap:10px;padding:12px 15px;background:#111827;border:1px solid #1e293b;border-radius:10px 10px 0 0;cursor:pointer;user-select:none;transition:background .15s;}
-.sec-hd:hover{background:#141e2e;}
-.sec-hd.closed{border-radius:10px;}
-.sec-title{font-size:12px;font-weight:600;color:#e2e8f0;flex:1;}
-.sec-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:12px;background:#1e293b;color:#475569;}
-.sec-badge.done{background:#14532d;color:#4ade80;}
-.sec-chev{color:#334155;font-size:12px;transition:transform .2s;}
-.sec-chev.open{transform:rotate(180deg);}
-.items-wrap{border:1px solid #1e293b;border-top:none;border-radius:0 0 10px 10px;overflow:hidden;}
-.item{display:flex;align-items:flex-start;gap:11px;padding:12px 15px;border-bottom:1px solid #111827;transition:background .1s;}
-.item:last-child{border-bottom:none;}
-.item.iacc{background:rgba(20,83,45,.08);}
-.item.irej{background:rgba(127,29,29,.08);}
-.item.icrit{border-left:3px solid #f59e0b;}
-.item-num{font-size:10px;font-weight:600;color:#334155;min-width:24px;padding-top:1px;flex-shrink:0;}
-.item-body{flex:1;}
-.item-text{font-size:12px;color:#94a3b8;line-height:1.5;}
-.item-text.tcrit{color:#fde68a;}
-.item-who{display:flex;align-items:center;gap:5px;margin-top:4px;}
-.who-n{font-size:9px;font-weight:700;color:#3b82f6;background:rgba(59,130,246,.12);padding:1px 6px;border-radius:4px;}
-.who-t{font-size:9px;color:#334155;}
-.item-acts{display:flex;gap:4px;flex-shrink:0;}
-.sbtn{width:31px;height:31px;border-radius:7px;border:1px solid #1e293b;background:#0b0f18;color:#334155;font-size:14px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;font-family:inherit;}
-.sbtn:hover{border-color:#334155;color:#64748b;}
-.sbtn.sa{background:#14532d;border-color:#166534;color:#4ade80;}
-.sbtn.sr{background:#7f1d1d;border-color:#991b1b;color:#f87171;}
-.sbtn.sna{background:#1e293b;border-color:#334155;color:#94a3b8;}
-.nbtn{width:31px;height:31px;border-radius:7px;border:1px solid #1e293b;background:#0b0f18;color:#334155;font-size:12px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;}
-.nbtn:hover{border-color:#334155;color:#64748b;}
-.nbtn.has{border-color:#78350f;color:#f59e0b;background:rgba(120,53,15,.15);}
-.rpill{padding:3px 9px;border-radius:14px;font-size:10px;font-weight:700;flex-shrink:0;}
-.rpill-a{background:#14532d;color:#4ade80;}
-.rpill-r{background:#7f1d1d;color:#f87171;}
-.rpill-n{background:#1e293b;color:#94a3b8;}
-.rpill-p{border:1px solid #1e293b;color:#334155;}
-.note-row{padding:6px 15px 9px 50px;background:rgba(120,53,15,.06);border-bottom:1px solid #111827;}
-.note-row:last-child{border-bottom:none;}
-.note-text{font-size:11px;color:#d97706;font-style:italic;}
-.analytics{padding:28px;}
-.an-title{font-size:20px;font-weight:700;color:#f1f5f9;margin-bottom:4px;}
-.an-sub{font-size:13px;color:#64748b;margin-bottom:24px;}
-.an-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:28px;}
-.an-kpi{background:#111827;border:1px solid #1e293b;border-radius:12px;padding:18px;}
-.an-kpi-v{font-size:28px;font-weight:800;color:#f1f5f9;}
-.an-kpi-l{font-size:11px;color:#475569;margin-top:3px;font-weight:600;}
-.an-kpi.gkpi{border-color:#14532d;}.an-kpi.gkpi .an-kpi-v{color:#4ade80;}
-.an-kpi.rkpi{border-color:#7f1d1d;}.an-kpi.rkpi .an-kpi-v{color:#f87171;}
-.an-kpi.ykpi{border-color:#78350f;}.an-kpi.ykpi .an-kpi-v{color:#fbbf24;}
-.an-kpi.bkpi{border-color:#1d4ed8;}.an-kpi.bkpi .an-kpi-v{color:#60a5fa;}
-.an-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
-.chart-card{background:#111827;border:1px solid #1e293b;border-radius:12px;padding:18px;}
-.chart-title{font-size:13px;font-weight:700;color:#e2e8f0;margin-bottom:4px;}
-.chart-sub{font-size:11px;color:#475569;margin-bottom:16px;}
-.chart-wrap{height:200px;}
-.cabin-table{width:100%;border-collapse:collapse;font-size:12px;}
-.cabin-table th{text-align:left;padding:9px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#475569;border-bottom:1px solid #1e293b;}
-.cabin-table td{padding:10px 12px;border-bottom:1px solid #111827;color:#94a3b8;vertical-align:middle;}
-.cabin-table tr:last-child td{border-bottom:none;}
-.cabin-table tr:hover td{background:#141e2e;}
-.tbl-marker{font-weight:700;color:#e2e8f0;}
-.tbl-pct{font-weight:700;}
-.tbl-bar-bg{background:#1e293b;border-radius:3px;height:4px;width:80px;overflow:hidden;display:inline-block;vertical-align:middle;margin-left:6px;}
-.tbl-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#1d4ed8,#60a5fa);}
-.insp-stat{display:flex;align-items:center;gap:6px;padding:8px 0;border-bottom:1px solid #111827;}
-.insp-stat:last-child{border-bottom:none;}
-.insp-av{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
-.insp-name{font-size:12px;font-weight:600;color:#e2e8f0;flex:1;}
-.insp-count{font-size:11px;font-weight:700;color:#60a5fa;}
-.empty-analytics{text-align:center;padding:60px 20px;color:#334155;font-size:14px;}
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:80;display:flex;align-items:center;justify-content:center;padding:20px;}
-.modal{background:#111827;border:1px solid #1e293b;border-radius:16px;padding:24px;width:100%;max-width:440px;}
-.modal-t{font-size:16px;font-weight:700;color:#f1f5f9;margin-bottom:16px;}
-.modal-sub{font-size:12px;color:#64748b;margin-bottom:14px;line-height:1.5;}
-.f-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#475569;margin-bottom:6px;}
-.f-input{width:100%;background:#0b0f18;border:1px solid #1e293b;border-radius:9px;color:#e2e8f0;font-size:14px;padding:11px 13px;font-family:inherit;transition:border-color .15s;margin-bottom:14px;}
-.f-input:focus{outline:none;border-color:#3b82f6;}
-.ntextarea{width:100%;background:#0b0f18;border:1px solid #1e293b;border-radius:9px;color:#e2e8f0;font-size:12px;padding:11px 13px;resize:vertical;min-height:85px;font-family:inherit;transition:border-color .15s;}
-.ntextarea:focus{outline:none;border-color:#3b82f6;}
-.modal-acts{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;}
-.btn-cancel{padding:8px 16px;border-radius:8px;border:1px solid #1e293b;background:transparent;color:#64748b;font-size:12px;cursor:pointer;font-family:inherit;}
-.btn-ok{padding:8px 16px;border-radius:8px;border:none;background:#1d4ed8;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
-.btn-ok:disabled{background:#1e293b;color:#475569;cursor:not-allowed;}
-.btn-del{padding:8px 16px;border-radius:8px;border:none;background:#7f1d1d;color:#fca5a5;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
-@media(max-width:640px){
-  .sidebar{display:none;}
-  .overview,.analytics{padding:16px;}
-  .cl-topbar,.cl-stats,.prog-row,.sections{padding-left:16px;padding-right:16px;}
-  .an-row{grid-template-columns:1fr;}
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ОТК · Контроль кабин</title>
+    <!-- Загрузка React, ReactDOM, Babel и Recharts через CDN -->
+    <script src="[unpkg.com](https://unpkg.com/react@18/umd/react.production.min.js)"></script>
+    <script src="[unpkg.com](https://unpkg.com/react-dom@18/umd/react-dom.production.min.js)"></script>
+    <script src="[unpkg.com](https://unpkg.com/@babel/standalone/babel.min.js)"></script>
+    <script src="[unpkg.com](https://unpkg.com/prop-types@15.8.1/prop-types.min.js)"></script>
+    <script src="[unpkg.com](https://unpkg.com/recharts/umd/Recharts.js)"></script>
 </head>
 <body>
-<div id="root"></div>
+    <div id="root"></div>
 
-<script>
-// ─── USERS ────────────────────────────────────────────────────────────────────
-const USERS = [
-  { id: "amanat",  name: "Аманат",  role: "inspector" },
-  { id: "sanzhar", name: "Санжар",  role: "inspector" },
-  { id: "yelaman", name: "Еламан",  role: "inspector" },
-  { id: "nurseit", name: "Нурсейт", role: "master"    },
-  { id: "birlik",  name: "Бирлик",  role: "master"    },
-];
-const getUserById = id => USERS.find(u => u.id === id);
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+        const { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } = Recharts;
 
-// ─── STORAGE (localStorage — работает на GitHub Pages) ────────────────────────
-const storage = {
-  get(key) {
-    try { const v = localStorage.getItem(key); return v ? { value: v } : null; } catch { return null; }
-  },
-  set(key, value) {
-    try { localStorage.setItem(key, value); return true; } catch { return false; }
-  }
-};
+        // Эмуляция window.storage для локального запуска
+        if (!window.storage) {
+            window.storage = {
+                get: (key) => Promise.resolve({ value: localStorage.getItem(key) }),
+                set: (key, val) => Promise.resolve(localStorage.setItem(key, val))
+            };
+        }
 
-// ─── CHECKLIST TEMPLATES ─────────────────────────────────────────────────────
-const ASSEMBLY_TEMPLATE = {
-  id: "assembly", title: "Сборка кабины", icon: "🏗️",
-  sections: [
-    { id:"a1", title:"Этап 1 — Изготовление и заливка карты пола", items:[
-      {id:"a1_1",  text:"Соответствие используемых материалов согласно проекту (размеры профильной трубы, сечение арматуры)"},
-      {id:"a1_2",  text:"Соответствие изготовленного металлокаркаса согласно проекту (габариты, диагональ, отверстия)"},
-      {id:"a1_3",  text:"Проверка сварных соединений"},
-      {id:"a1_4",  text:"Грунтовка металла"},
-      {id:"a1_5",  text:"Проверка состояния опалубочной поверхности (чистка, смазка, фиксаторы)"},
-      {id:"a1_6",  text:"Заливка соответствующей проекту бетонной смеси"},
-      {id:"a1_7",  text:"Заглаживание поверхности"},
-      {id:"a1_8",  text:"Проверка набора прочности изделия пола после распалубки"},
-      {id:"a1_9",  text:"Проверка прямолинейности пола правилом"},
-      {id:"a1_10", text:"Грунтовка два слоя и гидроизоляция"},
-    ]},
-    { id:"a2", title:"Этап 2 — Изготовление несущих стен из металлического профиля и ГКЛВ", items:[
-      {id:"a2_1",  text:"Проверка геометрических размеров каркаса (длина, ширина, диагональ)"},
-      {id:"a2_2",  text:"Проверка крепления профилей между собой (саморезами и просекателем)"},
-      {id:"a2_3",  text:"Проверка наличия антисептированного бруска в стене с дверным проёмом и гидроизоляции бруска"},
-      {id:"a2_4",  text:"Проверка крепления ГКЛВ к металлическому каркасу"},
-      {id:"a2_5",  text:"Проверка шага шурупов к профилю 200–250 мм"},
-      {id:"a2_6",  text:"Проверка монтажного зазора от низа профиля до ГКЛВ 10 мм"},
-      {id:"a2_7",  text:"Проверка подгонки ГКЛВ под габариты каркаса"},
-      {id:"a2_8",  text:"Проверка гидроизоляции ГКЛВ по мокрым зонам кабины"},
-      {id:"a2_9",  text:"Проверка гидроизоляции в открытых участках ГКЛВ"},
-      {id:"a2_10", text:"СТЕНА ФАСАДНАЯ"},
-      {id:"a2_11", text:"СТЕНА ТОРЦЕВАЯ"},
-      {id:"a2_12", text:"СТЕНА ЛЕВАЯ"},
-      {id:"a2_13", text:"СТЕНА ПРАВАЯ"},
-    ]},
-    { id:"a3", title:"Этап 3 — Сборка СанТех кабины", items:[
-      {id:"a3_1",  text:"Проверка выставления пола по нулевым отметкам"},
-      {id:"a3_2",  text:"Проверка наличия уплотнительной ленты в полу, по периметру выставления стен"},
-      {id:"a3_3",  text:"Проверка герметика поверх уплотнительной ленты"},
-      {id:"a3_4",  text:"Проверка плотности прилегания стен между собой"},
-      {id:"a3_5",  text:"Замер внутренних и наружных габаритов кабины"},
-      {id:"a3_6",  text:"Замер диагоналей по внутренним стенам"},
-      {id:"a3_7",  text:"Проверка прямоугольности углов с использованием угловой линейки (90°)"},
-      {id:"a3_8",  text:"Проверка крепления стеновых панелей к каркасу пола с шагом 200±50 мм"},
-      {id:"a3_9",  text:"Проверка стыковки стен между собой саморезами с шагом крепления 200±50 мм"},
-      {id:"a3_10", text:"Проверка установки потолка к стенам по всему периметру с шагом 200±50 мм, отступ от края 25±5 мм"},
-    ]},
-    { id:"a4", title:"Этап 4 — Проверка полочки инсталляции", items:[
-      {id:"a4_1", text:"Проверка габаритов полочки инсталляции"},
-      {id:"a4_2", text:"Проверка крепления полочки инсталляции к стене"},
-      {id:"a4_3", text:"Проверка гидроизоляции по всей поверхности полки"},
-      {id:"a4_4", text:"Проверка наличия герметика в стыках полки и стенах"},
-      {id:"a4_5", text:"Проверка отверстий в полочке по проекту"},
-      {id:"a4_6", text:"Проверка крепления системы бачка инсталляции"},
-      {id:"a4_7", text:"Проверка наличия герметика во всех стыках кабины (между стеной и полом и в угловых стыках стен)"},
-    ]},
-  ]
-};
+        // ─── ДАННЫЕ И ТЕМПЛЕЙТЫ ──────────────────────────────────────────────────
+        const USERS = [
+            { id: "amanat",  name: "Аманат",  role: "inspector" },
+            { id: "sanzhar", name: "Санжар",  role: "inspector" },
+            { id: "yelaman", name: "Еламан",  role: "inspector" },
+            { id: "nurseit", name: "Нурсейт", role: "master"    },
+            { id: "birlik",  name: "Бирлик",  role: "master"    },
+        ];
+        
+        const getUserById = (id) => USERS.find(u => u.id === id) || { name: id || "Неизвестный", role: "unknown" };
 
-const SANTECH_TEMPLATE = {
-  id: "santech", title: "Чистовая отделка", icon: "🔧",
-  sections: [
-    { id:"s1", title:"1. Укладка плитки на пол", items:[
-      {id:"s1_1",  text:"Соответствие плитки проекту (типоразмер, артикул, цвет)"},
-      {id:"s1_2",  text:"Ровность основания перед укладкой (допуск 2 мм/2м)"},
-      {id:"s1_3",  text:"Толщина клеевого слоя (3–5 мм)"},
-      {id:"s1_4",  text:"Ширина межплиточных швов (±1,4 мм по проекту)"},
-      {id:"s1_5",  text:"Выравнивание плиток в одной плоскости (СВП)"},
-      {id:"s1_6",  text:"Проводка труб канализаций за ванной"},
-      {id:"s1_7",  text:"Установка ванны (горизонт. и вертикаль. положение)"},
-      {id:"s1_8",  text:"Прочность приклеивания (простукивание, без пустот)"},
-      {id:"s1_9",  text:"Периметральные швы (деформационный шов)"},
-      {id:"s1_10", text:"Уклон пола к сливному трапу (не менее 1%)"},
-      {id:"s1_11", text:"Затирка швов – цвет и состав по проекту (на цементной основе)"},
-    ]},
-    { id:"s2", title:"2. Укладка плитки на стены", items:[
-      {id:"s2_1",  text:"Соответствие плитки проекту (типоразмер, артикул, цвет)"},
-      {id:"s2_2",  text:"Вертикальность укладки (откл. не более 2 мм/2 м)"},
-      {id:"s2_3",  text:"Горизонтальность рядов по лазерному уровню"},
-      {id:"s2_4",  text:"Толщина клеевого слоя (3–6 мм)"},
-      {id:"s2_5",  text:"Ширина и равномерность межплиточных швов (1,4 мм)"},
-      {id:"s2_6",  text:"Соответствие отверстий под коммуникации проекту"},
-      {id:"s2_7",  text:"Укладка в труднодоступных местах (углы, ниши)"},
-      {id:"s2_8",  text:"Прочность приклеивания (простукивание, без пустот)"},
-      {id:"s2_9",  text:"Горизонтальность верхнего ряда плитки"},
-      {id:"s2_10", text:"Чистота поверхности плитки после укладки"},
-    ]},
-    { id:"s3", title:"3. Установка сантехнических приборов", items:[
-      {id:"s3_1",  text:"Соответствие приборов проекту (марка, модель)"},
-      {id:"s3_2",  text:"Разметка осей под приборы"},
-      {id:"s3_3",  text:"Унитаз: горизонтальность и плотность прилегания"},
-      {id:"s3_4",  text:"Замер подвесного унитаза согласно проекту"},
-      {id:"s3_5",  text:"Инсталляция к канализации (уклон, герметичность)"},
-      {id:"s3_6",  text:"Подводка ХВС (гибкая подводка, фитинги)"},
-      {id:"s3_7",  text:"Проверка кнопки слива унитаза (без пустот)"},
-      {id:"s3_8",  text:"Проверка тумбы"},
-      {id:"s3_9",  text:"Умывальник: горизонтальность, крепление"},
-      {id:"s3_10", text:"Подключение умывальника (водопровод, сифон)"},
-      {id:"s3_11", text:"Герметичность всех соединений (давление, осмотр)"},
-      {id:"s3_12", text:"Работа кранов, смесителей, запорной арматуры"},
-    ]},
-    { id:"s4", title:"4. Прокладка трубопроводов", items:[
-      {id:"s4_1",  text:"Соответствие труб проекту (материал, диаметр)"},
-      {id:"s4_2",  text:"Трассировка трубопроводов по схеме разводки"},
-      {id:"s4_3",  text:"Уклон канализац. труб (≥2% Ø50, ≥1% Ø110)"},
-      {id:"s4_4",  text:"Крепление труб к конструкциям (клипсы)"},
-      {id:"s4_5",  text:"Герметичность резьбовых и сварных соединений"},
-      {id:"s4_6",  text:"Наличие и расположение ревизий и прочисток"},
-      {id:"s4_7",  text:"Гидравлическое испытание труб ХВС (давл., время)"},
-      {id:"s4_8",  text:"Теплоизоляция труб ХВС (зоны промерзания)"},
-      {id:"s4_9",  text:"Проход труб через перекрытия (гильзы, герметиз.)"},
-      {id:"s4_10", text:"Отсутствие механических повреждений труб"},
-      {id:"s4_11", text:"Маркировка трубопроводов (среда, направление)"},
-      {id:"s4_12", text:"Заглушки на незадействованных отводах"},
-      {id:"s4_13", text:"Проверка обшивки Вилотерм"},
-    ]},
-    { id:"s5", title:"5. Потолок и вентиляция", items:[
-      {id:"s5_1",  text:"Соответствие потолочного покрытия проекту"},
-      {id:"s5_2",  text:"Горизонтальность потолка (допуск 2 мм/2 м)"},
-      {id:"s5_3",  text:"Надёжность крепления несущей конструкции"},
-      {id:"s5_4",  text:"Зазор между потолком и стенами (деформац. шов)"},
-      {id:"s5_5",  text:"Герметизация периметрального шва силиконом"},
-      {id:"s5_6",  text:"Вентиляционная решётка соответствует проекту"},
-      {id:"s5_7",  text:"Тип и IP-класс светильника (IP44/IP65)"},
-      {id:"s5_8",  text:"Крепление потолка шагом 200–250 мм и отступ (саморез, шайба рондоль)"},
-      {id:"s5_9",  text:"Проверка освещения (количество софитов, крепление, ровность)"},
-      {id:"s5_10", text:"Чистота потолка (без пятен, царапин, провисаний)"},
-    ]},
-    { id:"s6", title:"6. Электрика и освещение", items:[
-      {id:"s6_1", text:"Кабельная разводка по проекту (сечение, маркировка)"},
-      {id:"s6_2", text:"Заземление металлических элементов (шина PE)"},
-      {id:"s6_3", text:"Розетка: высота, удалённость от воды ≥ 600 мм"},
-      {id:"s6_4", text:"Класс защиты розетки (не ниже IP44, зона 2)"},
-      {id:"s6_5", text:"Выключатель: функциональность, расположение"},
-      {id:"s6_6", text:"Нет открытых клемм и незащищённых проводов"},
-      {id:"s6_7", text:"Проверка изоляции и УЗО"},
-    ]},
-    { id:"s7", title:"7. Итоговая приёмка и общий осмотр", items:[
-      {id:"s7_1",  text:"★ Осмотр плиточных поверхностей (трещины, сколы, пустоты)", critical:true},
-      {id:"s7_2",  text:"★ Целостность швов и герметизации (нет трещин в затирке)", critical:true},
-      {id:"s7_3",  text:"Нет загрязнений клеем, затиркой, силиконом на поверхностях"},
-      {id:"s7_4",  text:"★ Комплектность сантехнических приборов (крышки, кнопки, дозаторы)", critical:true},
-      {id:"s7_5",  text:"Нет следов монтажа (пятна пены, клея, пыли)"},
-      {id:"s7_6",  text:"★ Работа кранов и смесителей (отсутствие течи)", critical:true},
-      {id:"s7_7",  text:"★ Финальный пролив – водоотведение, нет протечек", critical:true},
-      {id:"s7_8",  text:"Маркировка и нумерация кабины"},
-      {id:"s7_9",  text:"Фотофиксация (фасад, интерьер, узлы)"},
-      {id:"s7_10", text:"★ Оформление акта приёмки, подпись инспектора ОТК", critical:true},
-    ]},
-  ]
-};
+        const ASSEMBLY_TEMPLATE = {
+            id: "assembly", title: "Сборка кабины", icon: "🏗️",
+            sections: [
+                { id:"a1", title:"Этап 1 — Карта пола", items:[
+                    {id:"a1_1",  text:"Соответствие используемых материалов (трубы, арматура)"},
+                    {id:"a1_2",  text:"Геометрия металлокаркаса (габариты, диагонали)"},
+                    {id:"a1_3",  text:"Проверка сварных соединений"},
+                    {id:"a1_4",  text:"Грунтовка металла"},
+                    {id:"a1_6",  text:"Заливка бетонной смеси по проекту"},
+                    {id:"a1_10", text:"Гидроизоляция (2 слоя)"},
+                ]},
+                { id:"a2", title:"Этап 2 — Стены (Профиль/ГКЛВ)", items:[
+                    {id:"a2_1",  text:"Геометрия каркаса стен (длина, ширина, диагональ)"},
+                    {id:"a2_3",  text:"Антисептированный брусок в дверном проеме"},
+                    {id:"a2_5",  text:"Шаг шурупов ГКЛВ (200–250 мм)"},
+                    {id:"a2_8",  text:"Гидроизоляция мокрых зон"},
+                ]},
+                { id:"a3", title:"Этап 3 — Сборка СанТех кабины", items:[
+                    {id:"a3_5",  text:"Замер внутренних и наружных габаритов"},
+                    {id:"a3_7",  text:"Проверка углов (90°)"},
+                    {id:"a3_10", text:"Установка потолка (шаг крепления)"},
+                ]}
+            ]
+        };
 
-const TEMPLATES = [ASSEMBLY_TEMPLATE, SANTECH_TEMPLATE];
-const CHART_COLORS = ["#3b82f6","#22c55e","#f87171","#f59e0b","#a78bfa","#34d399"];
-const PIE_COLORS = { accept:"#22c55e", reject:"#f87171", na:"#94a3b8", pending:"#1e293b" };
+        const SANTECH_TEMPLATE = {
+            id: "santech", title: "Чистовая отделка", icon: "🔧",
+            sections: [
+                { id:"s1", title:"1. Плитка пол", items:[
+                    {id:"s1_1",  text:"Типоразмер и цвет плитки"},
+                    {id:"s1_10", text:"Уклон пола к трапу (не менее 1%)"},
+                ]},
+                { id:"s2", title:"2. Плитка стены", items:[
+                    {id:"s2_2",  text:"Вертикальность укладки (2 мм на 2м)"},
+                    {id:"s2_8",  text:"Простукивание (отсутствие пустот)"},
+                ]},
+                { id:"s7", title:"7. Итоговая приёмка", items:[
+                    {id:"s7_1",  text:"★ Трещины, сколы, пустоты", critical:true},
+                    {id:"s7_6",  text:"★ Работа смесителей (без течи)", critical:true},
+                    {id:"s7_7",  text:"★ Финальный пролив системы", critical:true},
+                ]}
+            ]
+        };
 
-const nowStr = () => new Date().toLocaleString("ru-RU",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});
-const genId  = () => Math.random().toString(36).slice(2,9);
+        const TEMPLATES = [ASSEMBLY_TEMPLATE, SANTECH_TEMPLATE];
 
-const initData = () => {
-  const d = {};
-  TEMPLATES.forEach(t => {
-    d[t.id] = {};
-    t.sections.forEach(s => s.items.forEach(i => { d[t.id][i.id] = {status:null,note:"",inspector:null,time:null}; }));
-  });
-  return d;
-};
+        // ─── ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ─────────────────────────────────────────────
+        const nowStr = () => new Date().toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+        const genId  = () => Math.random().toString(36).slice(2, 9);
 
-const getStats = (tplId, cabinData) => {
-  const tpl = TEMPLATES.find(t => t.id === tplId);
-  if (!tpl) return {total:0,accepted:0,rejected:0,na:0,pending:0};
-  const all = tpl.sections.flatMap(s => s.items);
-  let accepted=0, rejected=0, na=0;
-  all.forEach(i => {
-    const s = cabinData?.[tplId]?.[i.id]?.status;
-    if (s==="accept") accepted++;
-    else if (s==="reject") rejected++;
-    else if (s==="na") na++;
-  });
-  return {total:all.length, accepted, rejected, na, pending:all.length-accepted-rejected-na};
-};
-</script>
+        const initData = () => {
+            const d = {};
+            TEMPLATES.forEach(t => {
+                d[t.id] = {};
+                t.sections.forEach(s => s.items.forEach(i => { 
+                    d[t.id][i.id] = { status: null, note: "", inspector: null, time: null }; 
+                }));
+            });
+            return d;
+        };
 
-<script>
-// ─── REACT APP ────────────────────────────────────────────────────────────────
-const { useState, useEffect, useMemo } = React;
-const { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } = Recharts;
+        const getStats = (tplId, cabinData) => {
+            const tpl = TEMPLATES.find(t => t.id === tplId);
+            if (!tpl) return { total: 0, accepted: 0, rejected: 0, na: 0, pending: 0 };
+            const all = tpl.sections.flatMap(s => s.items);
+            let accepted = 0, rejected = 0, na = 0;
+            all.forEach(i => {
+                const s = cabinData?.[tplId]?.[i.id]?.status;
+                if (s === "accept") accepted++;
+                else if (s === "reject") rejected++;
+                else if (s === "na") na++;
+            });
+            return { total: all.length, accepted, rejected, na, pending: all.length - (accepted + rejected + na) };
+        };
 
-function App() {
-  const [user,        setUser]        = useState(null);
-  const [nameInput,   setNameInput]   = useState("");
-  const [loginError,  setLoginError]  = useState("");
-  const [page,        setPage]        = useState("cabins");
-  const [cabins,      setCabins]      = useState([]);
-  const [selCabin,    setSelCabin]    = useState(null);
-  const [activePhase, setPhase]       = useState("assembly");
-  const [openSecs,    setOpenSecs]    = useState({});
-  const [noteModal,   setNoteModal]   = useState(null);
-  const [createModal, setCreateModal] = useState(false);
-  const [deleteModal, setDeleteModal] = useState(null);
-  const [newMarker,   setNewMarker]   = useState("");
-  const [newDesc,     setNewDesc]     = useState("");
-  const [syncState,   setSyncState]   = useState("ok");
-  const [loaded,      setLoaded]      = useState(false);
+        const CHART_COLORS = ["#3b82f6", "#22c55e", "#f87171", "#f59e0b", "#a78bfa"];
+        const PIE_COLORS = { accept: "#22c55e", reject: "#f87171", na: "#94a3b8", pending: "#1e293b" };
 
-  // ── Load from localStorage ──
-  useEffect(() => {
-    try {
-      const r = storage.get("otk_v3_cabins");
-      if (r?.value) setCabins(JSON.parse(r.value));
-    } catch {}
-    setLoaded(true);
-  }, []);
+        // ─── ГЛАВНЫЙ КОМПОНЕНТ ───────────────────────────────────────────────────
+        function App() {
+            const [user, setUser] = useState(null);
+            const [nameInput, setNameInput] = useState("");
+            const [page, setPage] = useState("cabins"); 
+            const [cabins, setCabins] = useState([]);
+            const [selCabin, setSelCabin] = useState(null);
+            const [activePhase, setPhase] = useState("assembly");
+            const [openSecs, setOpenSecs] = useState({});
+            const [createModal, setCreateModal] = useState(false);
+            const [newMarker, setNewMarker] = useState("");
+            const [loaded, setLoaded] = useState(false);
 
-  // ── Save to localStorage ──
-  useEffect(() => {
-    if (!loaded) return;
-    setSyncState("saving");
-    const t = setTimeout(() => {
-      try {
-        storage.set("otk_v3_cabins", JSON.stringify(cabins));
-        setSyncState("ok");
-      } catch { setSyncState("error"); }
-    }, 600);
-    return () => clearTimeout(t);
-  }, [cabins, loaded]);
+            useEffect(() => {
+                window.storage.get("otk_v3_cabins").then(r => {
+                    if (r?.value) setCabins(JSON.parse(r.value));
+                    setLoaded(true);
+                });
+            }, []);
 
-  const cabin = cabins.find(c => c.id === selCabin) || null;
+            useEffect(() => {
+                if (loaded) window.storage.set("otk_v3_cabins", JSON.stringify(cabins));
+            }, [cabins, loaded]);
 
-  const handleLogin = () => {
-    const match = USERS.find(u => u.name.toLowerCase() === nameInput.trim().toLowerCase());
-    if (!match) { setLoginError("Имя не найдено. Проверьте написание."); return; }
-    setUser(match); setLoginError(""); setNameInput("");
-  };
+            const cabin = useMemo(() => cabins.find(c => c.id === selCabin), [cabins, selCabin]);
 
-  const getD = (phaseId, itemId) =>
-    cabin?.data?.[phaseId]?.[itemId] || {status:null,note:"",inspector:null,time:null};
+            const handleLogin = () => {
+                const match = USERS.find(u => u.name.toLowerCase() === nameInput.trim().toLowerCase());
+                if (match) { setUser(match); setNameInput(""); }
+                else alert("Имя не найдено");
+            };
 
-  const setStatus = (phaseId, itemId, status) => {
-    setCabins(prev => prev.map(c => c.id !== selCabin ? c : {
-      ...c, data: { ...c.data, [phaseId]: { ...c.data[phaseId],
-        [itemId]: { ...c.data[phaseId][itemId], status, inspector:user.id, time:nowStr() }
-      }}
-    }));
-  };
+            const setStatus = (phaseId, itemId, status) => {
+                setCabins(prev => prev.map(c => c.id !== selCabin ? c : {
+                    ...c, data: { 
+                        ...c.data, 
+                        [phaseId]: { 
+                            ...c.data[phaseId],
+                            [itemId]: { ...c.data[phaseId][itemId], status, inspector: user.id, time: nowStr() } 
+                        }
+                    }
+                }));
+            };
 
-  const setNote = (phaseId, itemId, note) => {
-    setCabins(prev => prev.map(c => c.id !== selCabin ? c : {
-      ...c, data: { ...c.data, [phaseId]: { ...c.data[phaseId],
-        [itemId]: { ...c.data[phaseId][itemId], note }
-      }}
-    }));
-  };
+            const createCabin = () => {
+                if (!newMarker.trim()) return;
+                const nc = { id: genId(), marker: newMarker.toUpperCase(), createdAt: nowStr(), data: initData() };
+                setCabins([...cabins, nc]);
+                setCreateModal(false); setNewMarker("");
+            };
 
-  const createCabin = () => {
-    if (!newMarker.trim()) return;
-    const nc = { id:genId(), marker:newMarker.trim().toUpperCase(), desc:newDesc.trim(),
-      createdAt:nowStr(), data:initData() };
-    setCabins(p => [...p, nc]);
-    setCreateModal(false); setNewMarker(""); setNewDesc("");
-    setSelCabin(nc.id); setPhase("assembly"); setPage("cabins");
-  };
+            const analytics = useMemo(() => {
+                if (!cabins.length) return null;
+                const barData = cabins.map(c => ({
+                    name: c.marker,
+                    "Прогресс": Math.round(((getStats("assembly", c.data).accepted + getStats("santech", c.data).accepted) / (ASSEMBLY_TEMPLATE.sections.flatMap(s=>s.items).length + SANTECH_TEMPLATE.sections.flatMap(s=>s.items).length)) * 100)
+                }));
+                return { barData };
+            }, [cabins]);
 
-  const deleteCabin = (id) => {
-    setCabins(p => p.filter(c => c.id !== id));
-    if (selCabin === id) setSelCabin(null);
-    setDeleteModal(null);
-  };
+            if (!user) return (
+                <div className="login-screen">
+                    <div className="login-box">
+                        <h2>ОТК Вход</h2>
+                        <input className="input" value={nameInput} onChange={e => setNameInput(e.target.value)} placeholder="Ваше имя" />
+                        <button className="btn primary" onClick={handleLogin}>Войти</button>
+                        <div className="hints">Попробуйте: Аманат, Санжар или Нурсейт</div>
+                    </div>
+                </div>
+            );
 
-  const analytics = useMemo(() => {
-    if (!cabins.length) return null;
-    let totalItems=0, totalAccepted=0, totalRejected=0, totalNa=0;
-    const byInspector = {};
-    const cabinRows = cabins.map(c => {
-      const as = getStats("assembly", c.data);
-      const ss = getStats("santech",  c.data);
-      const tot = as.total + ss.total;
-      const done = as.accepted+as.rejected+as.na + ss.accepted+ss.rejected+ss.na;
-      totalItems    += tot;
-      totalAccepted += as.accepted + ss.accepted;
-      totalRejected += as.rejected + ss.rejected;
-      totalNa       += as.na + ss.na;
-      TEMPLATES.forEach(t => {
-        t.sections.forEach(sec => sec.items.forEach(item => {
-          const d = c.data?.[t.id]?.[item.id];
-          if (d?.inspector && d.status) {
-            byInspector[d.inspector] = (byInspector[d.inspector]||0) + 1;
-          }
-        }));
-      });
-      return {
-        id:c.id, marker:c.marker,
-        aPct: Math.round(((as.accepted+as.rejected+as.na)/Math.max(as.total,1))*100),
-        sPct: Math.round(((ss.accepted+ss.rejected+ss.na)/Math.max(ss.total,1))*100),
-        overallPct: tot>0 ? Math.round((done/tot)*100) : 0,
-      };
-    });
-    const pieData = [
-      {name:"Принято",   value:totalAccepted, color:PIE_COLORS.accept},
-      {name:"Отклонено", value:totalRejected, color:PIE_COLORS.reject},
-      {name:"Н/Д",       value:totalNa,        color:PIE_COLORS.na},
-      {name:"Ожидает",   value:totalItems-totalAccepted-totalRejected-totalNa, color:PIE_COLORS.pending},
-    ].filter(d => d.value > 0);
-    const barData = cabins.map(c => {
-      const as = getStats("assembly",c.data);
-      const ss = getStats("santech", c.data);
-      return { name:c.marker,
-        "Сборка":  Math.round(((as.accepted+as.rejected+as.na)/Math.max(as.total,1))*100),
-        "Отделка": Math.round(((ss.accepted+ss.rejected+ss.na)/Math.max(ss.total,1))*100),
-      };
-    });
-    const inspData = Object.entries(byInspector).map(([id,cnt]) => ({
-      user: getUserById(id), cnt
-    })).sort((a,b)=>b.cnt-a.cnt);
-    return { totalItems, totalAccepted, totalRejected, totalNa,
-      totalCabins:cabins.length, cabinRows, pieData, barData, inspData };
-  }, [cabins]);
+            return (
+                <div className="app-container">
+                    <header className="main-header">
+                        <div className="brand" onClick={() => setPage("cabins")}>🏗️ ОТК КОНТРОЛЬ</div>
+                        <div className="user-info">{user.name} ({user.role})</div>
+                    </header>
 
-  const isInspector = user?.role === "inspector";
-  const tmpl = TEMPLATES.find(t => t.id === activePhase);
-  const phaseStats = cabin ? getStats(activePhase, cabin.data) : null;
-  const phasePct = phaseStats ? Math.round(
-    ((phaseStats.accepted+phaseStats.rejected+phaseStats.na)/Math.max(phaseStats.total,1))*100
-  ) : 0;
+                    <nav className="nav-bar">
+                        <button className={page === 'cabins' ? 'active' : ''} onClick={() => setPage('cabins')}>Кабины</button>
+                        <button className={page === 'analytics' ? 'active' : ''} onClick={() => {setPage('analytics'); setSelCabin(null);}}>Аналитика</button>
+                    </nav>
 
-  // ── Login ──
-  if (!user) return React.createElement("div", {className:"login"},
-    React.createElement("div", {className:"login-card"},
-      React.createElement("div", {className:"login-logo"},
-        React.createElement("div", {className:"login-logo-mark"}, "🏗"),
-        React.createElement("div", null,
-          React.createElement("div", {className:"login-logo-text"}, "ОТК · Контроль"),
-          React.createElement("div", {className:"login-logo-sub"}, "Система проверки кабин")
-        )
-      ),
-      React.createElement("div", {className:"login-heading"}, "Вход в систему"),
-      React.createElement("div", {className:"login-hint"}, "Введите своё имя точно как указано ниже"),
-      React.createElement("div", {className:"field-label"}, "Ваше имя"),
-      React.createElement("div", {className:"field-wrap"},
-        React.createElement("input", {
-          className:"field-input", placeholder:"Введите имя…",
-          value:nameInput, autoFocus:true,
-          onChange: e => { setNameInput(e.target.value); setLoginError(""); },
-          onKeyDown: e => e.key==="Enter" && handleLogin()
-        })
-      ),
-      loginError && React.createElement("div", {className:"login-error"}, loginError),
-      React.createElement("button", {className:"btn-login", disabled:!nameInput.trim(), onClick:handleLogin}, "Войти"),
-      React.createElement("div", {style:{marginTop:20}},
-        React.createElement("div", {style:{fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:".1em",color:"#334155",marginBottom:8}}, "Инспекторы ОТК"),
-        React.createElement("div", {className:"login-names"},
-          USERS.filter(u=>u.role==="inspector").map(u =>
-            React.createElement("span", {key:u.id, className:"name-chip inspector",
-              onClick:()=>{ setNameInput(u.name); setLoginError(""); }}, u.name)
-          )
-        ),
-        React.createElement("div", {style:{fontSize:10,fontWeight:700,textTransform:"uppercase",letterSpacing:".1em",color:"#334155",margin:"12px 0 8px"}}, "Мастера"),
-        React.createElement("div", {className:"login-names"},
-          USERS.filter(u=>u.role==="master").map(u =>
-            React.createElement("span", {key:u.id, className:"name-chip master",
-              onClick:()=>{ setNameInput(u.name); setLoginError(""); }}, u.name)
-          )
-        )
-      )
-    )
-  );
+                    <main className="content">
+                        {page === "cabins" && !selCabin && (
+                            <div className="overview">
+                                <h3>Список кабин</h3>
+                                <div className="grid">
+                                    {cabins.map(c => (
+                                        <div key={c.id} className="card" onClick={() => setSelCabin(c.id)}>
+                                            <div className="marker">{c.marker}</div>
+                                            <div className="date">{c.createdAt}</div>
+                                        </div>
+                                    ))}
+                                    {user.role === 'inspector' && (
+                                        <div className="card add-card" onClick={() => setCreateModal(true)}>+ Новая кабина</div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
 
-  // ── Main App ──
-  return React.createElement("div", null,
-    // HEADER
-    React.createElement("div", {className:"hdr"},
-      React.createElement("div", {className:"hdr-brand"},
-        React.createElement("div", {className:"hdr-mark"}, "🏗"),
-        React.createElement("div", {className:"hdr-title"}, "ОТК")
-      ),
-      React.createElement("div", {className:"hdr-sep"}),
-      React.createElement("div", {className:"hdr-user"},
-        React.createElement("div", {className:`hdr-av ${isInspector?"hdr-av-i":"hdr-av-m"}`}, user.name[0]),
-        React.createElement("div", null,
-          React.createElement("div", {className:"hdr-uname"}, user.name),
-          React.createElement("div", {className:"hdr-urole"}, isInspector?"Инспектор ОТК":"Мастер")
-        )
-      ),
-      React.createElement("div", {className:"hdr-r"},
-        React.createElement("span", {className:`sync-badge ${syncState==="ok"?"sync-ok":syncState==="saving"?"sync-saving":"sync-err"}`},
-          syncState==="ok"?"☁ Сохранено":syncState==="saving"?"↑ Сохранение…":"⚠ Ошибка"
-        ),
-        React.createElement("button", {className:"btn-ghost",
-          onClick:()=>{ setUser(null); setSelCabin(null); setPage("cabins"); }}, "Выйти")
-      )
-    ),
+                        {page === "cabins" && selCabin && cabin && (
+                            <div className="checklist">
+                                <button className="btn" onClick={() => setSelCabin(null)}>← Назад</button>
+                                <h2>{cabin.marker}</h2>
+                                <div className="phase-tabs">
+                                    {TEMPLATES.map(t => (
+                                        <button key={t.id} className={activePhase === t.id ? "active" : ""} onClick={() => setPhase(t.id)}>
+                                            {t.icon} {t.title}
+                                        </button>
+                                    ))}
+                                </div>
+                                <div className="items">
+                                    {TEMPLATES.find(t => t.id === activePhase).sections.map(sec => (
+                                        <div key={sec.id} className="section">
+                                            <h4>{sec.title}</h4>
+                                            {sec.items.map(item => {
+                                                const d = cabin.data[activePhase][item.id];
+                                                return (
+                                                    <div key={item.id} className={`item ${d.status}`}>
+                                                        <div className="text">{item.text}</div>
+                                                        <div className="actions">
+                                                            <button onClick={() => setStatus(activePhase, item.id, 'accept')}>✓</button>
+                                                            <button onClick={() => setStatus(activePhase, item.id, 'reject')}>✗</button>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
-    // NAV TABS
-    React.createElement("div", {className:"nav-tabs"},
-      React.createElement("div", {className:`nav-tab ${page==="cabins"?"active":""}`, onClick:()=>setPage("cabins")}, "🚿 Кабины"),
-      React.createElement("div", {className:`nav-tab ${page==="analytics"?"active":""}`,
-        onClick:()=>{ setPage("analytics"); setSelCabin(null); }}, "📊 Аналитика")
-    ),
+                        {page === "analytics" && analytics && (
+                            <div className="analytics">
+                                <h3>Аналитика прогресса</h3>
+                                <div style={{width: '100%', height: 300}}>
+                                    <ResponsiveContainer>
+                                        <BarChart data={analytics.barData}>
+                                            <XAxis dataKey="name" />
+                                            <YAxis />
+                                            <Tooltip />
+                                            <Bar dataKey="Прогресс" fill="#3b82f6" />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+                        )}
+                    </main>
 
-    // LAYOUT
-    React.createElement("div", {className:"layout"},
-      // SIDEBAR
-      page !== "analytics" && React.createElement("div", {className:"sidebar"},
-        React.createElement("div", {className:"sb-hd"},
-          React.createElement("span", {className:"sb-hd-label"}, `Кабины (${cabins.length})`),
-          isInspector && React.createElement("button", {className:"sb-add", onClick:()=>setCreateModal(true)}, "+")
-        ),
-        cabins.length === 0 && React.createElement("div", {className:"sb-empty"}, "Нет кабин"),
-        cabins.map(c => {
-          const as = getStats("assembly",c.data), ss = getStats("santech",c.data);
-          const ap = Math.round(((as.accepted+as.rejected+as.na)/Math.max(as.total,1))*100);
-          const sp = Math.round(((ss.accepted+ss.rejected+ss.na)/Math.max(ss.total,1))*100);
-          return React.createElement("div", {key:c.id, className:`sb-item ${selCabin===c.id?"active":""}`,
-            onClick:()=>{ setSelCabin(c.id); setPhase("assembly"); setPage("cabins"); }},
-            React.createElement("span", {style:{fontSize:14}}, "🚿"),
-            React.createElement("div", {style:{flex:1,minWidth:0}},
-              React.createElement("div", {className:"sb-marker"}, c.marker),
-              React.createElement("div", {style:{fontSize:9,color:"#334155",marginTop:2}}, `${ap}% · ${sp}%`)
-            ),
-            React.createElement("div", {className:"sb-dots"},
-              React.createElement("div", {className:`dot ${ap===100?"dot-full":ap>0?"dot-part":"dot-none"}`}),
-              React.createElement("div", {className:`dot ${sp===100?"dot-full":sp>0?"dot-part":"dot-none"}`})
-            )
-          );
-        }),
-        isInspector && React.createElement("div", {style:{padding:"10px 8px 0"}},
-          React.createElement("button", {className:"btn-ok", style:{width:"100%",padding:"8px"},
-            onClick:()=>setCreateModal(true)}, "+ Новая кабина")
-        )
-      ),
+                    {createModal && (
+                        <div className="modal-overlay">
+                            <div className="modal">
+                                <h3>Создать новую кабину</h3>
+                                <input className="input" value={newMarker} onChange={e => setNewMarker(e.target.value)} placeholder="Номер кабины (напр. А-101)" />
+                                <div className="modal-btns">
+                                    <button className="btn" onClick={() => setCreateModal(false)}>Отмена</button>
+                                    <button className="btn primary" onClick={createCabin}>Создать</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
 
-      // CONTENT
-      React.createElement("div", {className:"content"},
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
 
-        // ANALYTICS
-        page==="analytics" && React.createElement("div", {className:"analytics"},
-          React.createElement("div", {className:"an-title"}, "📊 Аналитика"),
-          React.createElement("div", {className:"an-sub"}, "Общая статистика по всем кабинам"),
-          !analytics
-            ? React.createElement("div", {className:"empty-analytics"}, "Нет данных — создайте хотя бы одну кабину")
-            : React.createElement("div", null,
-                React.createElement("div", {className:"an-grid"},
-                  React.createElement("div", {className:"an-kpi bkpi"},
-                    React.createElement("div", {className:"an-kpi-v"}, analytics.totalCabins),
-                    React.createElement("div", {className:"an-kpi-l"}, "Всего кабин")
-                  ),
-                  React.createElement("div", {className:"an-kpi"},
-                    React.createElement("div", {className:"an-kpi-v"}, analytics.totalItems),
-                    React.createElement("div", {className:"an-kpi-l"}, "Пунктов проверки")
-                  ),
-                  React.createElement("div", {className:"an-kpi gkpi"},
-                    React.createElement("div", {className:"an-kpi-v"}, analytics.totalAccepted),
-                    React.createElement("div", {className:"an-kpi-l"}, "Принято")
-                  ),
-                  React.createElement("div", {className:"an-kpi rkpi"},
-                    React.createElement("div", {className:"an-kpi-v"}, analytics.totalRejected),
-                    React.createElement("div", {className:"an-kpi-l"}, "Отклонено")
-                  ),
-                  React.createElement("div", {className:"an-kpi ykpi"},
-                    React.createElement("div", {className:"an-kpi-v"}, analytics.totalItems-analytics.totalAccepted-analytics.totalRejected-analytics.totalNa),
-                    React.createElement("div", {className:"an-kpi-l"}, "Ожидает проверки")
-                  ),
-                  React.createElement("div", {className:"an-kpi"},
-                    React.createElement("div", {className:"an-kpi-v"},
-                      analytics.totalItems>0 ? Math.round((analytics.totalAccepted/analytics.totalItems)*100) : 0, "%"
-                    ),
-                    React.createElement("div", {className:"an-kpi-l"}, "Процент приёмки")
-                  )
-                ),
-                React.createElement("div", {className:"an-row"},
-                  React.createElement("div", {className:"chart-card"},
-                    React.createElement("div", {className:"chart-title"}, "Прогресс по кабинам"),
-                    React.createElement("div", {className:"chart-sub"}, "% выполнения обоих чек-листов"),
-                    React.createElement("div", {className:"chart-wrap"},
-                      React.createElement(ResponsiveContainer, {width:"100%",height:"100%"},
-                        React.createElement(BarChart, {data:analytics.barData,barSize:14,barGap:3},
-                          React.createElement(XAxis, {dataKey:"name",tick:{fill:"#475569",fontSize:10},axisLine:false,tickLine:false}),
-                          React.createElement(YAxis, {domain:[0,100],tick:{fill:"#334155",fontSize:10},axisLine:false,tickLine:false}),
-                          React.createElement(Tooltip, {contentStyle:{background:"#1e293b",border:"1px solid #334155",borderRadius:8,fontSize:12},labelStyle:{color:"#e2e8f0"},itemStyle:{color:"#94a3b8"}}),
-                          React.createElement(Bar, {dataKey:"Сборка",fill:"#3b82f6",radius:[4,4,0,0]}),
-                          React.createElement(Bar, {dataKey:"Отделка",fill:"#22c55e",radius:[4,4,0,0]})
-                        )
-                      )
-                    )
-                  ),
-                  React.createElement("div", {className:"chart-card"},
-                    React.createElement("div", {className:"chart-title"}, "Распределение статусов"),
-                    React.createElement("div", {className:"chart-sub"}, "По всем пунктам всех кабин"),
-                    React.createElement("div", {className:"chart-wrap",style:{display:"flex",alignItems:"center"}},
-                      React.createElement(ResponsiveContainer, {width:"60%",height:"100%"},
-                        React.createElement(PieChart, null,
-                          React.createElement(Pie, {data:analytics.pieData,cx:"50%",cy:"50%",innerRadius:45,outerRadius:75,dataKey:"value",paddingAngle:3},
-                            analytics.pieData.map((entry,i) => React.createElement(Cell, {key:i,fill:entry.color}))
-                          ),
-                          React.createElement(Tooltip, {contentStyle:{background:"#1e293b",border:"1px solid #334155",borderRadius:8,fontSize:12}})
-                        )
-                      ),
-                      React.createElement("div", {style:{flex:1}},
-                        analytics.pieData.map((d,i) =>
-                          React.createElement("div", {key:i,style:{display:"flex",alignItems:"center",gap:6,marginBottom:6}},
-                            React.createElement("div", {style:{width:8,height:8,borderRadius:"50%",background:d.color,flexShrink:0}}),
-                            React.createElement("span", {style:{fontSize:11,color:"#64748b"}}, d.name),
-                            React.createElement("span", {style:{fontSize:11,fontWeight:700,color:"#e2e8f0",marginLeft:"auto"}}, d.value)
-                          )
-                        )
-                      )
-                    )
-                  )
-                ),
-                React.createElement("div", {className:"an-row"},
-                  React.createElement("div", {className:"chart-card"},
-                    React.createElement("div", {className:"chart-title"}, "Активность инспекторов"),
-                    React.createElement("div", {className:"chart-sub"}, "Количество выполненных проверок"),
-                    analytics.inspData.length===0
-                      ? React.createElement("div", {style:{fontSize:12,color:"#334155",padding:"20px 0"}}, "Нет данных")
-                      : analytics.inspData.map((e,i) =>
-                          React.createElement("div", {key:i,className:"insp-stat"},
-                            React.createElement("div", {className:"insp-av hdr-av-i",style:{background:`linear-gradient(135deg,${CHART_COLORS[i%CHART_COLORS.length]},${CHART_COLORS[(i+1)%CHART_COLORS.length]})`}},
-                              e.user?.name[0]||"?"
-                            ),
-                            React.createElement("span", {className:"insp-name"}, e.user?.name||e.id),
-                            React.createElement("span", {className:"insp-count"}, `${e.cnt} пунктов`)
-                          )
-                        )
-                  ),
-                  React.createElement("div", {className:"chart-card"},
-                    React.createElement("div", {className:"chart-title"}, "Таблица кабин"),
-                    React.createElement("div", {className:"chart-sub"}, "Сборка и отделка по каждой"),
-                    React.createElement("table", {className:"cabin-table"},
-                      React.createElement("thead", null,
-                        React.createElement("tr", null,
-                          React.createElement("th", null, "Кабина"),
-                          React.createElement("th", null, "🏗️ Сборка"),
-                          React.createElement("th", null, "🔧 Отделка"),
-                          React.createElement("th", null, "Итого")
-                        )
-                      ),
-                      React.createElement("tbody", null,
-                        analytics.cabinRows.map(r =>
-                          React.createElement("tr", {key:r.id},
-                            React.createElement("td", {className:"tbl-marker"}, r.marker),
-                            React.createElement("td", null,
-                              React.createElement("span", {className:`tbl-pct ${r.aPct===100?"pct-g":r.aPct>0?"pct-y":"pct-0"}`}, `${r.aPct}%`),
-                              React.createElement("span", {className:"tbl-bar-bg"},
-                                React.createElement("span", {className:"tbl-bar-fill",style:{width:`${r.aPct}%`}})
-                              )
-                            ),
-                            React.createElement("td", null,
-                              React.createElement("span", {className:`tbl-pct ${r.sPct===100?"pct-g":r.sPct>0?"pct-y":"pct-0"}`}, `${r.sPct}%`),
-                              React.createElement("span", {className:"tbl-bar-bg"},
-                                React.createElement("span", {className:"tbl-bar-fill",style:{width:`${r.sPct}%`}})
-                              )
-                            ),
-                            React.createElement("td", null,
-                              React.createElement("span", {className:`tbl-pct ${r.overallPct===100?"pct-g":r.overallPct>0?"pct-y":"pct-0"}`}, `${r.overallPct}%`)
-                            )
-                          )
-                        )
-                      )
-                    )
-                  )
-                )
-              )
-        ),
-
-        // CABINS LIST
-        page==="cabins" && !selCabin && React.createElement("div", {className:"overview"},
-          React.createElement("div", {className:"ov-title"}, "Кабины"),
-          React.createElement("div", {className:"ov-sub"}, "Выберите кабину для проверки или создайте новую"),
-          React.createElement("div", {className:"cabin-grid"},
-            cabins.map(c => {
-              const as=getStats("assembly",c.data), ss=getStats("santech",c.data);
-              const ap=Math.round(((as.accepted+as.rejected+as.na)/Math.max(as.total,1))*100);
-              const sp=Math.round(((ss.accepted+ss.rejected+ss.na)/Math.max(ss.total,1))*100);
-              return React.createElement("div", {key:c.id,className:"cabin-card",
-                onClick:()=>{ setSelCabin(c.id); setPhase("assembly"); }},
-                React.createElement("div", {className:"cc-marker"}, `🚿 ${c.marker}`),
-                React.createElement("div", {className:"cc-desc"}, c.desc||" "),
-                React.createElement("div", {className:"cc-phases"},
-                  React.createElement("div", {className:"cc-phase"},
-                    React.createElement("div", {className:"cc-phase-name"}, "🏗️ Сборка"),
-                    React.createElement("div", {className:`cc-phase-pct ${ap===100?"pct-g":ap>0?"pct-y":"pct-0"}`}, `${ap}%`)
-                  ),
-                  React.createElement("div", {className:"cc-phase"},
-                    React.createElement("div", {className:"cc-phase-name"}, "🔧 Отделка"),
-                    React.createElement("div", {className:`cc-phase-pct ${sp===100?"pct-g":sp>0?"pct-y":"pct-0"}`}, `${sp}%`)
-                  )
-                ),
-                React.createElement("div", {className:"cc-date"}, `Создана: ${c.createdAt}`)
-              );
-            }),
-            isInspector && React.createElement("div", {className:"cabin-add-card",onClick:()=>setCreateModal(true)},
-              React.createElement("div", {className:"cabin-add-icon"}, "＋"),
-              React.createElement("div", {className:"cabin-add-text"}, "Создать кабину")
-            )
-          )
-        ),
-
-        // CHECKLIST VIEW
-        page==="cabins" && selCabin && cabin && React.createElement("div", {className:"cl-wrap"},
-          React.createElement("div", {className:"cl-topbar"},
-            React.createElement("div", null,
-              React.createElement("div", {className:"cl-back",onClick:()=>setSelCabin(null)}, "← Все кабины"),
-              React.createElement("div", {className:"cl-title"}, `🚿 ${cabin.marker}`),
-              cabin.desc && React.createElement("div", {className:"cl-sub"}, cabin.desc),
-              React.createElement("div", {style:{fontSize:10,color:"#334155",marginTop:3}}, `Создана: ${cabin.createdAt}`)
-            ),
-            React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:8,alignItems:"flex-end"}},
-              React.createElement("div", {className:"cl-phase-tabs"},
-                TEMPLATES.map(t => {
-                  const s=getStats(t.id,cabin.data);
-                  const p=Math.round(((s.accepted+s.rejected+s.na)/Math.max(s.total,1))*100);
-                  return React.createElement("button", {key:t.id,className:`phase-tab ${activePhase===t.id?"active":""}`,onClick:()=>setPhase(t.id)},
-                    t.icon," ",t.title,
-                    React.createElement("span", {className:`tpct ${p===100?"tpct-g":p>0?"tpct-y":"tpct-0"}`}, `${p}%`)
-                  );
-                })
-              ),
-              isInspector && React.createElement("button", {className:"btn-ghost",
-                style:{color:"#f87171",borderColor:"#7f1d1d",fontSize:11},
-                onClick:()=>setDeleteModal(cabin.id)}, "🗑 Удалить кабину")
-            )
-          ),
-          !isInspector && React.createElement("div", {className:"ro-banner"}, "👁 Режим просмотра — только инспекторы ОТК могут вносить отметки."),
-          React.createElement("div", {className:"cl-stats"},
-            React.createElement("div", {className:"cstat"}, React.createElement("div", {className:"cstat-v"}, phaseStats.total), React.createElement("div", {className:"cstat-l"}, "Всего")),
-            React.createElement("div", {className:"cstat cg"}, React.createElement("div", {className:"cstat-v"}, phaseStats.accepted), React.createElement("div", {className:"cstat-l"}, "Принято")),
-            React.createElement("div", {className:"cstat cr"}, React.createElement("div", {className:"cstat-v"}, phaseStats.rejected), React.createElement("div", {className:"cstat-l"}, "Отклонено")),
-            React.createElement("div", {className:"cstat cy"}, React.createElement("div", {className:"cstat-v"}, phaseStats.pending), React.createElement("div", {className:"cstat-l"}, "Ожидает"))
-          ),
-          React.createElement("div", {className:"prog-row"},
-            React.createElement("div", {className:"prog-bg"}, React.createElement("div", {className:"prog-fill",style:{width:`${phasePct}%`}})),
-            React.createElement("span", {className:"prog-pct"}, `${phasePct}%`)
-          ),
-          React.createElement("div", {className:"sections"},
-            tmpl.sections.map(sec => {
-              const tot=sec.items.length;
-              const done=sec.items.filter(i=>getD(activePhase,i.id).status!==null).length;
-              const open=openSecs[sec.id]!==false;
-              return React.createElement("div", {key:sec.id,className:"section"},
-                React.createElement("div", {className:`sec-hd ${open?"":"closed"}`,
-                  onClick:()=>setOpenSecs(p=>({...p,[sec.id]:!open}))},
-                  React.createElement("span", {className:"sec-title"}, sec.title),
-                  React.createElement("span", {className:`sec-badge ${done===tot?"done":""}`}, `${done}/${tot}`),
-                  React.createElement("span", {className:`sec-chev ${open?"open":""}`}, "▾")
-                ),
-                open && React.createElement("div", {className:"items-wrap"},
-                  sec.items.map(item => {
-                    const d=getD(activePhase,item.id);
-                    const insp=d.inspector?getUserById(d.inspector):null;
-                    return React.createElement("div", {key:item.id},
-                      React.createElement("div", {className:`item ${d.status==="accept"?"iacc":d.status==="reject"?"irej":""} ${item.critical?"icrit":""}`},
-                        React.createElement("span", {className:"item-num"}, item.id),
-                        React.createElement("div", {className:"item-body"},
-                          React.createElement("div", {className:`item-text ${item.critical?"tcrit":""}`}, item.text),
-                          d.status && insp && React.createElement("div", {className:"item-who"},
-                            React.createElement("span", {className:"who-n"}, insp.name),
-                            React.createElement("span", {className:"who-t"}, d.time)
-                          )
-                        ),
-                        isInspector
-                          ? React.createElement("div", {className:"item-acts"},
-                              React.createElement("button", {className:`sbtn ${d.status==="accept"?"sa":""}`,
-                                onClick:()=>setStatus(activePhase,item.id,d.status==="accept"?null:"accept")}, "✓"),
-                              React.createElement("button", {className:`sbtn ${d.status==="reject"?"sr":""}`,
-                                onClick:()=>setStatus(activePhase,item.id,d.status==="reject"?null:"reject")}, "✗"),
-                              React.createElement("button", {className:`sbtn ${d.status==="na"?"sna":""}`,
-                                onClick:()=>setStatus(activePhase,item.id,d.status==="na"?null:"na")}, "—"),
-                              React.createElement("button", {className:`nbtn ${d.note?"has":""}`,
-                                onClick:()=>setNoteModal({phaseId:activePhase,itemId:item.id,text:d.note||"",itemText:item.text})}, "✏")
-                            )
-                          : React.createElement("span", {className:`rpill ${d.status==="accept"?"rpill-a":d.status==="reject"?"rpill-r":d.status==="na"?"rpill-n":"rpill-p"}`},
-                              d.status==="accept"?"✓ Принято":d.status==="reject"?"✗ Откл.":d.status==="na"?"— Н/Д":"Ожидает"
-                            )
-                      ),
-                      d.note && React.createElement("div", {className:"note-row"},
-                        React.createElement("div", {className:"note-text"}, `📝 ${d.note}`)
-                      )
-                    );
-                  })
-                )
-              );
-            })
-          )
-        )
-      )
-    ),
-
-    // MODALS
-    createModal && React.createElement("div", {className:"overlay",onClick:e=>e.target===e.currentTarget&&setCreateModal(false)},
-      React.createElement("div", {className:"modal"},
-        React.createElement("div", {className:"modal-t"}, "Новая кабина"),
-        React.createElement("div", {className:"f-label"}, "Маркировка *"),
-        React.createElement("input", {className:"f-input",placeholder:"Пример: А-101, КБ-045…",
-          value:newMarker, autoFocus:true,
-          onChange:e=>setNewMarker(e.target.value),
-          onKeyDown:e=>e.key==="Enter"&&createCabin()}),
-        React.createElement("div", {className:"f-label"}, "Описание / Адрес"),
-        React.createElement("input", {className:"f-input",placeholder:"Блок, этаж, корпус…",
-          value:newDesc, onChange:e=>setNewDesc(e.target.value)}),
-        React.createElement("div", {className:"modal-acts"},
-          React.createElement("button", {className:"btn-cancel",
-            onClick:()=>{ setCreateModal(false); setNewMarker(""); setNewDesc(""); }}, "Отмена"),
-          React.createElement("button", {className:"btn-ok",disabled:!newMarker.trim(),onClick:createCabin}, "Создать")
-        )
-      )
-    ),
-
-    deleteModal && React.createElement("div", {className:"overlay",onClick:e=>e.target===e.currentTarget&&setDeleteModal(null)},
-      React.createElement("div", {className:"modal"},
-        React.createElement("div", {className:"modal-t"}, "Удалить кабину?"),
-        React.createElement("div", {className:"modal-sub"},
-          "Все данные проверок кабины ",
-          React.createElement("strong", {style:{color:"#f1f5f9"}}, cabins.find(c=>c.id===deleteModal)?.marker),
-          " будут удалены безвозвратно."
-        ),
-        React.createElement("div", {className:"modal-acts"},
-          React.createElement("button", {className:"btn-cancel",onClick:()=>setDeleteModal(null)}, "Отмена"),
-          React.createElement("button", {className:"btn-del",onClick:()=>deleteCabin(deleteModal)}, "Удалить")
-        )
-      )
-    ),
-
-    noteModal && React.createElement("div", {className:"overlay",onClick:e=>e.target===e.currentTarget&&setNoteModal(null)},
-      React.createElement("div", {className:"modal"},
-        React.createElement("div", {className:"modal-t"}, "Примечание"),
-        React.createElement("div", {className:"modal-sub"}, noteModal.itemText),
-        React.createElement("textarea", {className:"ntextarea",value:noteModal.text,autoFocus:true,
-          onChange:e=>setNoteModal(p=>({...p,text:e.target.value})),
-          placeholder:"Введите примечание…"}),
-        React.createElement("div", {className:"modal-acts"},
-          noteModal.text && React.createElement("button", {className:"btn-del",
-            onClick:()=>{ setNote(noteModal.phaseId,noteModal.itemId,""); setNoteModal(null); }}, "Удалить"),
-          React.createElement("button", {className:"btn-cancel",onClick:()=>setNoteModal(null)}, "Отмена"),
-          React.createElement("button", {className:"btn-ok",
-            onClick:()=>{ setNote(noteModal.phaseId,noteModal.itemId,noteModal.text); setNoteModal(null); }}, "Сохранить")
-        )
-      )
-    )
-  );
-}
-
-ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
-</script>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text-main: #f1f5f9;
+            --primary: #3b82f6;
+            --success: #22c55e;
+            --danger: #ef4444;
+        }
+        body { margin: 0; font-family: sans-serif; background: var(--bg); color: var(--text-main); }
+        .login-screen { height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: var(--card); padding: 40px; border-radius: 12px; text-align: center; }
+        .input { padding: 10px; width: 200px; border-radius: 6px; border: 1px solid #475569; margin-bottom: 10px; display: block; margin: 10px auto; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; background: #475569; color: white; }
+        .btn.primary { background: var(--primary); }
+        .main-header { padding: 15px 20px; background: var(--card); display: flex; justify-content: space-between; border-bottom: 1px solid #334155; }
+        .nav-bar { display: flex; background: var(--card); padding: 0 20px; gap: 20px; }
+        .nav-bar button { background: none; border: none; color: #94a3b8; padding: 15px 0; cursor: pointer; border-bottom: 2px solid transparent; }
+        .nav-bar button.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .content { padding: 20px; max-width: 900px; margin: 0 auto; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-top: 20px; }
+        .card { background: var(--card); padding: 20px; border-radius: 10px; cursor: pointer; text-align: center; }
+        .add-card { border: 2px dashed #475569; background: none; }
+        .phase-tabs { display: flex; gap: 10px; margin: 20px 0; }
+        .phase-tabs button { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: var(--card); color: white; cursor: pointer; }
+        .phase-tabs button.active { border-color: var(--primary); background: #1e3a8a; }
+        .section { margin-top: 25px; }
+        .item { background: var(--card); padding: 12px; margin-bottom: 8px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .item.accept { border-left: 4px solid var(--success); }
+        .item.reject { border-left: 4px solid var(--danger); }
+        .item .actions button { margin-left: 5px; padding: 5px 10px; border-radius: 4px; border: none; cursor: pointer; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; }
+        .modal { background: var(--card); padding: 25px; border-radius: 12px; width: 300px; }
+        .hints { font-size: 12px; color: #64748b; margin-top: 15px; }
+    </style>
 </body>
 </html>
